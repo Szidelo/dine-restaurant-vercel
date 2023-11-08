@@ -13,15 +13,15 @@ const Form = () => {
 		hour: "",
 		minute: "",
 	});
-    const [people, setPeople] = useState(1);
+	const [people, setPeople] = useState(1);
 
-    const handleCount = (symbol) => {
-        if (symbol === "+") {
-            setPeople(people + 1);
-        } else if (symbol === "-" && people > 1) {
-            setPeople(people - 1);
-        }
-    }
+	const handleCount = (symbol) => {
+		if (symbol === "+") {
+			setPeople(people + 1);
+		} else if (symbol === "-" && people > 1) {
+			setPeople(people - 1);
+		}
+	};
 
 	const [nameError, setNameError] = useState(false);
 	const [emailError, setEmailError] = useState(false);
@@ -44,9 +44,9 @@ const Form = () => {
 
 	const validateDate = () => {
 		if (
-			(date.day === "" || date.day > 31) ||
-			(date.month === "" || date.month > 12) ||
-			(date.year === "" || date.year < 2023)
+			date.day === "" ||
+			date.month === "" ||
+			date.year === "" 
 		) {
 			return setDateError(true);
 		}
@@ -59,7 +59,6 @@ const Form = () => {
 		}
 		return setTimeError(false);
 	};
-      
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -71,9 +70,9 @@ const Form = () => {
 		if (
 			name !== "" &&
 			email !== "" &&
-			(date.day !== "" && date.day <= 31) &&
-			(date.month !== "" && date.month <= 12) &&
-			(date.year !== "" && date.year >= 2023) &&
+			date.day !== "" &&
+			date.month !== "" &&
+			date.year !== "" &&
 			time.hour !== "" &&
 			time.minute !== ""
 		) {
@@ -117,24 +116,24 @@ const Form = () => {
 					type="number"
 					value={date.day}
 					placeholder="DD"
-                    max="31"
-					onChange={(e) => setDate({ ...date, day: e.target.value })}
+					max="31"
+					onChange={(e) => setDate({ ...date, day: e.target.value > 31 ? 31 : e.target.value && e.target.value < 1 ? 1 : e.target.value})}
 				/>
 				<input
 					type="number"
 					value={date.month}
 					placeholder="MM"
-                    max="12"
+					max="12"
 					onChange={(e) =>
-						setDate({ ...date, month: e.target.value })
+						setDate({ ...date, month: e.target.value > 12 ? 12 : e.target.value && e.target.value < 1 ? 1 : e.target.value })
 					}
 				/>
 				<input
 					type="number"
 					value={date.year}
 					placeholder="YYYY"
-                    min="2023"
-					onChange={(e) => setDate({ ...date, year: e.target.value })}
+					min="2023"
+					onChange={(e) => setDate({ ...date, year: e.target.value < 2023 ? 2023 : e.target.value && e.target.value > 2030 ? 2030 : e.target.value})}
 				/>
 			</div>
 			<div>
@@ -148,16 +147,16 @@ const Form = () => {
 					type="number"
 					value={time.hour}
 					placeholder="09"
-                    max="12"
-					onChange={(e) => setTime({ ...time, hour: e.target.value })}
+					max="12"
+					onChange={(e) => setTime({ ...time, hour: e.target.value > 12 ? 12 : e.target.value})}
 				/>
 				<input
 					type="number"
 					value={time.minute}
 					placeholder="00"
-                    max="59"
+					max="59"
 					onChange={(e) =>
-						setTime({ ...time, minute: e.target.value })
+						setTime({ ...time, minute: e.target.value > 59 ? 59 : e.target.value})
 					}
 				/>
 				<div className="custom-select">
@@ -168,9 +167,19 @@ const Form = () => {
 				</div>
 			</div>
 			<div className="select-people">
-				<p onClick={() => handleCount('-')} className="select-symbol">-</p>
+				<p
+					onClick={() => handleCount("-")}
+					className="select-symbol"
+				>
+					-
+				</p>
 				<p className="edit">{people} people</p>
-				<p  onClick={() => handleCount('+')}className="select-symbol">+</p>
+				<p
+					onClick={() => handleCount("+")}
+					className="select-symbol"
+				>
+					+
+				</p>
 			</div>
 			<button className="btn-dine">make reservation</button>
 		</form>
