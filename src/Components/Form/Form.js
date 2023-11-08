@@ -1,6 +1,8 @@
 import "./Form.css";
 import { useState } from "react";
 
+const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
 const Form = () => {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
@@ -36,18 +38,14 @@ const Form = () => {
 	};
 
 	const validateEmail = () => {
-		if (email === "") {
+		if (email === "" || !emailRegex.test(email)) {
 			return setEmailError(true);
 		}
 		return setEmailError(false);
 	};
 
 	const validateDate = () => {
-		if (
-			date.day === "" ||
-			date.month === "" ||
-			date.year === "" 
-		) {
+		if (date.day === "" || date.month === "" || date.year === "") {
 			return setDateError(true);
 		}
 		return setDateError(false);
@@ -67,9 +65,12 @@ const Form = () => {
 		validateDate();
 		validateTime();
 
+		console.log(emailRegex.test(email));
+
 		if (
 			name !== "" &&
 			email !== "" &&
+			emailRegex.test(email) &&
 			date.day !== "" &&
 			date.month !== "" &&
 			date.year !== "" &&
@@ -103,13 +104,13 @@ const Form = () => {
 				onChange={(e) => setEmail(e.target.value)}
 			/>
 			<p className={emailError ? "input-error m-0 p-0" : "hidden"}>
-				This field is required!
+				Please use a valid email address!
 			</p>
 			<div>
 				<label>
 					Pick a date:
 					<p className={dateError ? "input-error m-0 p-0" : "hidden"}>
-						This field is required!
+						This field is incomplete!
 					</p>
 				</label>
 				<input
@@ -117,7 +118,17 @@ const Form = () => {
 					value={date.day}
 					placeholder="DD"
 					max="31"
-					onChange={(e) => setDate({ ...date, day: e.target.value > 31 ? 31 : e.target.value && e.target.value < 1 ? 1 : e.target.value})}
+					onChange={(e) =>
+						setDate({
+							...date,
+							day:
+								e.target.value > 31
+									? 31
+									: e.target.value && e.target.value < 1
+									? 1
+									: e.target.value,
+						})
+					}
 				/>
 				<input
 					type="number"
@@ -125,7 +136,15 @@ const Form = () => {
 					placeholder="MM"
 					max="12"
 					onChange={(e) =>
-						setDate({ ...date, month: e.target.value > 12 ? 12 : e.target.value && e.target.value < 1 ? 1 : e.target.value })
+						setDate({
+							...date,
+							month:
+								e.target.value > 12
+									? 12
+									: e.target.value && e.target.value < 1
+									? 1
+									: e.target.value,
+						})
 					}
 				/>
 				<input
@@ -133,14 +152,24 @@ const Form = () => {
 					value={date.year}
 					placeholder="YYYY"
 					min="2023"
-					onChange={(e) => setDate({ ...date, year: e.target.value < 2023 ? 2023 : e.target.value && e.target.value > 2030 ? 2030 : e.target.value})}
+					onChange={(e) =>
+						setDate({
+							...date,
+							year:
+								e.target.value < 2023
+									? 2023
+									: e.target.value && e.target.value > 2030
+									? 2030
+									: e.target.value,
+						})
+					}
 				/>
 			</div>
 			<div>
 				<label>
 					Pick a time:
 					<p className={timeError ? "input-error m-0 p-0" : "hidden"}>
-						This field is required!
+						This field is incomplete!
 					</p>
 				</label>
 				<input
@@ -148,7 +177,12 @@ const Form = () => {
 					value={time.hour}
 					placeholder="09"
 					max="12"
-					onChange={(e) => setTime({ ...time, hour: e.target.value > 12 ? 12 : e.target.value})}
+					onChange={(e) =>
+						setTime({
+							...time,
+							hour: e.target.value > 12 ? 12 : e.target.value,
+						})
+					}
 				/>
 				<input
 					type="number"
@@ -156,7 +190,10 @@ const Form = () => {
 					placeholder="00"
 					max="59"
 					onChange={(e) =>
-						setTime({ ...time, minute: e.target.value > 59 ? 59 : e.target.value})
+						setTime({
+							...time,
+							minute: e.target.value > 59 ? 59 : e.target.value,
+						})
 					}
 				/>
 				<div className="custom-select">
