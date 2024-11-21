@@ -33,17 +33,25 @@ const Form = () => {
 	};
 
 	const validateName = () => {
+		let isError = false;
 		if (name === "") {
-			return setNameError(true);
+			isError = true;
+		} else {
+			isError = false;
 		}
-		return setNameError(false);
+		setNameError(isError);
+		return isError;
 	};
 
 	const validateEmail = () => {
+		let isError = false;
 		if (email === "") {
-			return setEmailError(true);
+			isError = true;
+		} else {
+			isError = false;
 		}
-		return setEmailError(false);
+		setEmailError(isError);
+		return isError;
 	};
 
 	const validateDate = () => {
@@ -51,41 +59,52 @@ const Form = () => {
 		const yearCondition = +year < currentYear;
 		const monthCondition = +month < currentMonth && +year === currentYear;
 		const dayCondition = +day < currentDay && +month === currentMonth;
+		let isError = false;
 
 		if (yearCondition || monthCondition || dayCondition) {
-			setDateError(true);
+			isError = true;
 		} else {
-			setDateError(false);
+			isError = false;
 		}
+		setDateError(isError);
+		return isError;
 	};
 
 	const validateTime = () => {
-		if (time.hour === "" || time.minute === "") {
-			return setTimeError(true);
+		const { hour, minute } = time;
+		const currentTime = currentDate.toLocaleTimeString();
+		const currentHour = +currentTime.split(":")[0];
+		const currentMinute = +currentTime.split(":")[1];
+		let isError = false;
+
+		// to add logic for AM and PM time
+		// const dayTime = currentTime.split(" ")[1];
+
+		const dayCondition = +hour < currentHour && +date.day === currentDay;
+		const timeCondition = +minute < currentMinute && +hour === currentHour;
+
+		if (dayCondition || timeCondition) {
+			isError = true;
+		} else {
+			isError = false;
 		}
-		return setTimeError(false);
+		setTimeError(isError);
+		return isError;
 	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		validateName();
-		validateEmail();
-		validateDate();
-		validateTime();
+		const isNameError = validateName();
+		const isEmailError = validateEmail();
+		const isDateError = validateDate();
+		const isTimeError = validateTime();
 
-		if (
-			name !== "" &&
-			email !== "" &&
-			date.day !== "" &&
-			date.day <= 31 &&
-			date.month !== "" &&
-			date.month <= 12 &&
-			date.year !== "" &&
-			date.year >= 2023 &&
-			time.hour !== "" &&
-			time.minute !== ""
-		) {
-			window.location.href = "/confirmation";
+		if (isNameError || isEmailError || isDateError || isTimeError) {
+			console.table(isNameError, isEmailError, isDateError, isTimeError);
+		} else {
+			console.table(isNameError, isEmailError, isDateError, isTimeError);
+			console.log("navigate to confirmation");
+			// window.location.href = "/confirmation";
 		}
 	};
 
