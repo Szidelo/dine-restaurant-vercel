@@ -1,7 +1,10 @@
 import "./Form.css";
 import { useState } from "react";
 
-const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const currentDate = new Date();
+const currentMonth = currentDate.getMonth() + 1;
+const currentDay = currentDate.getDate();
+const currentYear = currentDate.getFullYear();
 
 const Form = () => {
 	const [name, setName] = useState("");
@@ -16,6 +19,10 @@ const Form = () => {
 		minute: "",
 	});
 	const [people, setPeople] = useState(1);
+	const [nameError, setNameError] = useState(false);
+	const [emailError, setEmailError] = useState(false);
+	const [dateError, setDateError] = useState(false);
+	const [timeError, setTimeError] = useState(false);
 
 	const handleCount = (symbol) => {
 		if (symbol === "+") {
@@ -25,11 +32,6 @@ const Form = () => {
 		}
 	};
 
-	const [nameError, setNameError] = useState(false);
-	const [emailError, setEmailError] = useState(false);
-	const [dateError, setDateError] = useState(false);
-	const [timeError, setTimeError] = useState(false);
-
 	const validateName = () => {
 		if (name === "") {
 			return setNameError(true);
@@ -38,17 +40,23 @@ const Form = () => {
 	};
 
 	const validateEmail = () => {
-		if (email === "" || !emailRegex.test(email)) {
+		if (email === "") {
 			return setEmailError(true);
 		}
 		return setEmailError(false);
 	};
 
 	const validateDate = () => {
-		if (date.day === "" || date.month === "" || date.year === "") {
-			return setDateError(true);
+		const { month, day, year } = date;
+		const yearCondition = +year < currentYear;
+		const monthCondition = +month < currentMonth && +year === currentYear;
+		const dayCondition = +day < currentDay && +month === currentMonth;
+
+		if (yearCondition || monthCondition || dayCondition) {
+			setDateError(true);
+		} else {
+			setDateError(false);
 		}
-		return setDateError(false);
 	};
 
 	const validateTime = () => {
@@ -65,15 +73,15 @@ const Form = () => {
 		validateDate();
 		validateTime();
 
-		console.log(emailRegex.test(email));
-
 		if (
 			name !== "" &&
 			email !== "" &&
-			emailRegex.test(email) &&
 			date.day !== "" &&
+			date.day <= 31 &&
 			date.month !== "" &&
+			date.month <= 12 &&
 			date.year !== "" &&
+			date.year >= 2023 &&
 			time.hour !== "" &&
 			time.minute !== ""
 		) {
@@ -82,119 +90,50 @@ const Form = () => {
 	};
 
 	return (
-		<form
-			onSubmit={handleSubmit}
-			className="form-wrapper p-4 p-sm-5"
-		>
-			<input
-				type="text"
-				value={name}
-				placeholder="Name"
-				className="w-100"
-				onChange={(e) => setName(e.target.value)}
-			/>
-			<p className={nameError ? "input-error m-0 p-0" : "hidden"}>
-				This field is required!
-			</p>
-			<input
-				type="text"
-				value={email}
-				placeholder="Email"
-				className="w-100"
-				onChange={(e) => setEmail(e.target.value)}
-			/>
-			<p className={emailError ? "input-error m-0 p-0" : "hidden"}>
-				Please use a valid email address!
-			</p>
+		<form onSubmit={handleSubmit} className="form-wrapper p-4 p-sm-5">
+			<input type="text" value={name} placeholder="Name" className="w-100" onChange={(e) => setName(e.target.value)} />
+			<p className={nameError ? "input-error m-0 p-0" : "hidden"}>This field is required!</p>
+			<input type="text" value={email} placeholder="Email" className="w-100" onChange={(e) => setEmail(e.target.value)} />
+			<p className={emailError ? "input-error m-0 p-0" : "hidden"}>This field is required!</p>
 			<div>
 				<label>
 					Pick a date:
-					<p className={dateError ? "input-error m-0 p-0" : "hidden"}>
-						This field is incomplete!
-					</p>
+					<p className={dateError ? "input-error m-0 p-0" : "hidden"}>This field is required!</p>
 				</label>
-				<input
-					type="number"
-					value={date.day}
-					placeholder="DD"
-					max="31"
-					onChange={(e) =>
-						setDate({
-							...date,
-							day:
-								e.target.value > 31
-									? 31
-									: e.target.value && e.target.value < 1
-									? 1
-									: e.target.value,
-						})
-					}
-				/>
 				<input
 					type="number"
 					value={date.month}
 					placeholder="MM"
 					max="12"
-					onChange={(e) =>
-						setDate({
-							...date,
-							month:
-								e.target.value > 12
-									? 12
-									: e.target.value && e.target.value < 1
-									? 1
-									: e.target.value,
-						})
-					}
+					onChange={(e) => setDate({ ...date, month: e.target.value })}
 				/>
 				<input
 					type="number"
-					value={date.year}
-					placeholder="YYYY"
-					min="2023"
-					onChange={(e) =>
-						setDate({
-							...date,
-							year:
-								e.target.value < 2023
-									? 2023
-									: e.target.value && e.target.value > 2030
-									? 2030
-									: e.target.value,
-						})
-					}
+					value={date.day}
+					placeholder="DD"
+					max="31"
+					onChange={(e) => setDate({ ...date, day: e.target.value })}
 				/>
+				<input type="number" value={date.year} placeholder="YYYY" onChange={(e) => setDate({ ...date, year: e.target.value })} />
 			</div>
 			<div>
 				<label>
 					Pick a time:
-					<p className={timeError ? "input-error m-0 p-0" : "hidden"}>
-						This field is incomplete!
-					</p>
+					<p className={timeError ? "input-error m-0 p-0" : "hidden"}>This field is required!</p>
 				</label>
 				<input
 					type="number"
 					value={time.hour}
 					placeholder="09"
 					max="12"
-					onChange={(e) =>
-						setTime({
-							...time,
-							hour: e.target.value > 12 ? 12 : e.target.value,
-						})
-					}
+					onChange={(e) => setTime({ ...time, hour: e.target.value })}
 				/>
 				<input
 					type="number"
 					value={time.minute}
 					placeholder="00"
 					max="59"
-					onChange={(e) =>
-						setTime({
-							...time,
-							minute: e.target.value > 59 ? 59 : e.target.value,
-						})
-					}
+					onChange={(e) => setTime({ ...time, minute: e.target.value })}
 				/>
 				<div className="custom-select">
 					<select>
@@ -204,17 +143,11 @@ const Form = () => {
 				</div>
 			</div>
 			<div className="select-people">
-				<p
-					onClick={() => handleCount("-")}
-					className="select-symbol"
-				>
+				<p onClick={() => handleCount("-")} className="select-symbol">
 					-
 				</p>
 				<p className="edit">{people} people</p>
-				<p
-					onClick={() => handleCount("+")}
-					className="select-symbol"
-				>
+				<p onClick={() => handleCount("+")} className="select-symbol">
 					+
 				</p>
 			</div>
