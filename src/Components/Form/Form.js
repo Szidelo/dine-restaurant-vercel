@@ -100,11 +100,9 @@ const Form = () => {
 		const isTimeError = validateTime();
 
 		if (isNameError || isEmailError || isDateError || isTimeError) {
-			console.table(isNameError, isEmailError, isDateError, isTimeError);
+			console.table({ isNameError, isEmailError, isDateError, isTimeError });
 		} else {
-			console.table(isNameError, isEmailError, isDateError, isTimeError);
-			console.log("navigate to confirmation");
-			// window.location.href = "/confirmation";
+			window.location.href = "/confirmation";
 		}
 	};
 
